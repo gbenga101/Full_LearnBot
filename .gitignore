@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+venv/
+*.env
+static/uploads/
+api_key.txt
+frontend/node_modules/  # Add this line (safe to include even if unused)
