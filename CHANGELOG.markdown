@@ -8,7 +8,7 @@ This changelog documents the development process of the AI-Driven Personalized L
 - **IDE**: VS Code
 - **Hardware**: Toshiba Portege R930 (4GB RAM, 250GB SSD, 2.7GHz 3rd Gen Intel)
 - **Frontend**: Pure HTML, CSS (Bootstrap), JavaScript
-- **Backend**: Python 3.x with Flask
+- **Backend**: Python 3.13 with Flask
 
 ## **Milestones**
 
@@ -19,21 +19,21 @@ This changelog documents the development process of the AI-Driven Personalized L
 - Integrate existing frontend with backend planning.
 
 **Tasks Completed**:
-1. **Project Discussion and Requirements**:
-   - Identified project goals: text simplification, file processing (PDFs/images), session memory.
-   - Assessed hardware constraints and set a 2-week roadmap.
-2. **Backend Structure Proposed**:
-   - Designed a modular structure:
-     - `app.py`: Main Flask app.
-     - `config/`: Configuration (e.g., API keys).
-     - `routes/`: API endpoints.
-     - `services/`: Business logic (e.g., Gemini API, OCR).
-     - `static/`: Upload storage.
-     - `tests/`: Testing scripts.
-   - Planned integration with frontend.
-3. **Frontend Integration Planning**:
-   - Reviewed existing `LearnBot` frontend structure (assets, css, js, index.html, etc.).
-   - Decided to move `LearnBot` into `frontend/` subdirectory for local development.
+- **Project Discussion and Requirements**:
+  - Identified project goals: text simplification, file processing (PDFs/images), session memory.
+  - Assessed hardware constraints and set a 2-week roadmap.
+- **Backend Structure Proposed**:
+  - Designed a modular structure:
+    - `app.py`: Main Flask app.
+    - `config/`: Configuration (e.g., API keys).
+    - `routes/`: API endpoints.
+    - `services/`: Business logic (e.g., Gemini API, OCR).
+    - `static/`: Upload storage.
+    - `tests/`: Testing scripts.
+  - Planned integration with frontend.
+- **Frontend Integration Planning**:
+  - Reviewed existing `LearnBot` frontend structure (assets, css, js, index.html, etc.).
+  - Decided to move `LearnBot` into `frontend/` subdirectory for local development.
 
 **Tools**:
 - VS Code, Git
@@ -54,32 +54,37 @@ This changelog documents the development process of the AI-Driven Personalized L
 - Move and verify frontend structure.
 
 **Tasks Completed**:
-1. **Verify Python Installation**:
-   - Checked Python and pip versions in VS Code terminal.
-   - Planned installation if needed (pending confirmation).
-2. **Create Project Directory and Initialize Git**:
-   - Created `personalized-learning-system` folder.
-   - Initialized Git with `.gitignore`:
-     ```
-     __pycache__/
-     *.pyc
-     venv/
-     *.env
-     static/uploads/
-     api_key.txt
-     ```
-   - Committed initial setup.
-3. **Plan Backend Structure**:
-   - Defined file paths (config, routes, services, etc.) as outlined.
-4. **Move Frontend into `frontend/`**:
-   - Backed up `LearnBot` folder.
-   - Moved `LearnBot` contents (assets, css, js, index.html, etc.) into `frontend/`.
-   - Verified all files intact and `index.html` loads locally without errors.
-5. **Update `.gitignore`**:
-   - Added `frontend/node_modules/` (future-proofing).
-   - Committed changes.
-6. **Test Local Frontend**:
-   - Opened `frontend/index.html` in browser, confirmed functionality with Bootstrap CSS.
+- **Verify Python Installation**:
+  - Confirmed Python 3.13 and pip installed (via `pip show` paths: `C:\Users\fagbe\AppData\Local\Programs\Python\Python313\`).
+- **Create Project Directory and Initialize Git**:
+  - Created `personalized-learning-system` folder.
+  - Initialized Git with `.gitignore`:
+    ```
+    __pycache__/
+    *.pyc
+    venv/
+    *.env
+    static/uploads/
+    api_key.txt
+    ```
+  - Committed initial setup.
+- **Plan Backend Structure**:
+  - Defined file paths (config, routes, services, etc.) as outlined.
+- **Move Frontend into `frontend/`**:
+  - Backed up `LearnBot` folder.
+  - Moved `LearnBot` contents (assets, css, js, index.html, etc.) into `frontend/`.
+  - Verified all files intact and `index.html` loads locally without errors.
+- **Update `.gitignore`**:
+  - Added `frontend/node_modules/` (future-proofing).
+  - Committed changes.
+- **Test Local Frontend**:
+  - Opened `frontend/index.html` in browser, confirmed functionality with Bootstrap CSS.
+- **Install Flask and Dependencies**:
+  - Installed Flask and Requests using `pip install -r requirements.txt`.
+  - Verified installations:
+    - Flask: 3.0.3
+    - Requests: 2.32.3
+  - Committed changes to Git.
 
 **Tools**:
 - VS Code, Git, File Explorer
@@ -91,17 +96,17 @@ This changelog documents the development process of the AI-Driven Personalized L
 **Success Criteria**:
 - Frontend moved and testable locally.
 - Backend structure ready for setup.
+- Dependencies installed.
 
 **Notes**:
 - Live site remains unaffected; local changes only.
-- Stopped at 01:11 AM WAT, July 28, 2025, with 15 minutes remaining.
+- Stopped at 01:50 AM WAT, July 28, 2025, after installing dependencies.
 
 ---
 
 ## **Pending Tasks (To Resume)**
 
 - **Milestone 1 Continuation**:
-  - Install Flask and dependencies (`pip install -r requirements.txt`).
   - Create backend files (app.py, config.py, etc.).
   - Obtain Google Gemini API key.
   - Test Flask app and Gemini API.
@@ -110,9 +115,9 @@ This changelog documents the development process of the AI-Driven Personalized L
   - Implement `/simplify` route.
 
 ## **Environment Setup**
-- **Python**: To be confirmed installed.
-- **Flask**: Planned for installation.
-- **Requests**: Planned for API testing.
+- **Python**: 3.13 (confirmed installed).
+- **Flask**: 3.0.3 (installed).
+- **Requests**: 2.32.3 (installed).
 - **Tesseract**: Planned for Week 2 OCR.
 
 ## **Future Enhancements**
@@ -121,4 +126,4 @@ This changelog documents the development process of the AI-Driven Personalized L
 - Local testing and deployment adjustments.
 
 ## **Conclusion**
-Progress is on track with frontend integration complete locally. Next session will focus on backend setup and API integration. Save this file in the project root (`personalized-learning-system/CHANGELOG.md`) for reference.
+Progress is on track with frontend integration and environment setup complete locally. Next session will focus on backend file creation and API integration. Save this file in the project root (`personalized-learning-system/CHANGELOG.md`) for reference.
