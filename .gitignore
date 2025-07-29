@@ -5,3 +5,4 @@ venv/
 static/uploads/
 api_key.txt
 frontend/node_modules/  # Add this line (safe to include even if unused)
+/.env  # Add this line to ignore the .env file
