@@ -26,12 +26,20 @@ class TextSimplifier:
         :param level: Target reading level (e.g., "elementary", "high school").
         :return: Simplified text, or None if an error occurred.
         """
-        """ prompt = f"Take the following complex text and simplify it for a {level} audience: '{text}'. Return only the simplified version, no additional instructions or prompts." """
-        prompt = (
+ 
+        """prompt = (
             f"You are an AI tutor with 20 years of experience. Break down and explain this topic to a {level} student in clear, structured steps: '{text}'. "
             "Include analogies, real-world examples, and keep the original meaning intact. Avoid removing the core message or dumbing it down too much. Do not hallucinate. "
             "Format your answer like a short lesson with clear structure.\n\n"
+        ) """
+
+        prompt = (
+            f"You are an AI teacher with 20 years of experience. Summarize and simplify the following academic text for a {level} student. Use plain English and make it very easy to understand. "
+            "Avoid long paragraphs, unnecessary repetition, or overexplaining. Keep it short but meaningful. "
+            "Make sure the important ideas are not removed. Think like you're helping a confused student understand quickly and clearly:\n\n"
+            f"{text}"
         )
+
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
         try:
