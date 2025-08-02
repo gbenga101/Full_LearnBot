@@ -14,8 +14,8 @@ class TextSimplifier:
         "v1beta/models/gemini-1.5-flash-latest:generateContent"
     )
 
-    def __init__(self, timeout: float = 5.0):
-        self.timeout = timeout
+    def __init__(self, timeout: float = 15.0):
+        self.timeout = Config.GEMINI_TIMEOUT  # Use Config's timeout
         self.api_key = Config.GEMINI_API_KEY  # Use Config's key
         self.session = requests.Session()
 
@@ -26,7 +26,12 @@ class TextSimplifier:
         :param level: Target reading level (e.g., "elementary", "high school").
         :return: Simplified text, or None if an error occurred.
         """
-        prompt = f"Take the following complex text and simplify it for a {level} audience: '{text}'. Return only the simplified version, no additional instructions or prompts."
+        """ prompt = f"Take the following complex text and simplify it for a {level} audience: '{text}'. Return only the simplified version, no additional instructions or prompts." """
+        prompt = (
+            f"You are an AI tutor with 20 years of experience. Break down and explain this topic to a {level} student in clear, structured steps: '{text}'. "
+            "Include analogies, real-world examples, and keep the original meaning intact. Avoid removing the core message or dumbing it down too much. Do not hallucinate. "
+            "Format your answer like a short lesson with clear structure.\n\n"
+        )
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
         try:
