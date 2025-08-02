@@ -12,12 +12,14 @@ if __name__ == '__main__':
 
  """
 from flask import Flask
+from flask_cors import CORS
 from routes.api import api_bp
 from config.config import Config
 
 app = Flask(__name__)
+CORS(app, origins=["http://127.0.0.1:5500", "http://localhost:5500"]) # Enable CORS for all routes
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
-app.config['JSON_SORT_KEYS'] = False  # Prevent sorting JSON keys
+app.config['JSON_SORT_KEYS'] = False # Prevent sorting JSON keys
 
 app.register_blueprint(api_bp)
 
