@@ -3,7 +3,7 @@ import os
 import sys
 
 # 1. Load the API key from an environment variable for security
-API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyCS2yadT9SkwdNvoOHoKHnR8hNZzFcrGIQ')  # Default for testing, replace with your key later
+API_KEY = os.getenv('GEMINI_API_KEY')  # Load API key securely from environment variable
 
 # Check if the API key is available
 if not API_KEY:
