@@ -5,16 +5,12 @@ from config.config import Config
 
 app = Flask(__name__)
 # Enable CORS for all routes
-CORS(app, resources={
-    r"/simplify": {
-        "origins": [
-            "https://gbenga101.github.io/LearnBot",
-            "https://learnbot-now.vercel.app/",
-            "http://localhost:5500",
-            "http://127.0.0.1:5500"
-        ]
-    }
-})
+CORS(app, origins=[
+    "https://gbenga101.github.io/LearnBot",      # GitHub
+    "https://learnbot-now.vercel.app/",  # Vercel frontend domain
+    "http://localhost:5500",            # XAMPP and local testing
+    "http://127.0.0.1:5500"
+])
 
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['JSON_SORT_KEYS'] = False # Prevent sorting JSON keys
