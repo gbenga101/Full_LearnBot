@@ -27,7 +27,6 @@ class TextSimplifier:
         payload = {
             "contents": [
                 {
-                    "role": "user",
                     "parts": [
                         {
                             "text": prompt
