@@ -50,9 +50,10 @@ class TextSimplifier:
             )
             response.raise_for_status()
             logger.debug("API Response: %s", response.text)
+
         except requests.RequestException as e:
             logger.error("Network error during simplify_text: %s", e)
-            return None
+            return "Sorry, I couldn't simplify this text right now. Please try again later."
 
         try:
             data = response.json()

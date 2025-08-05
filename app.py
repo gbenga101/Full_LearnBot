@@ -2,6 +2,9 @@ from flask import Flask
 from flask_cors import CORS
 from routes.api import api_bp
 from config.config import Config
+import logging
+
+logging.basicConfig(level=logging.DEBUG)  # Add this to show logs on Render
 
 app = Flask(__name__)
 
