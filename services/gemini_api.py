@@ -38,6 +38,7 @@ class TextSimplifier:
         }
 
         try:
+            logger.debug("Sending Payload: %s", payload)
             response = self.session.post(
                 f"{self.BASE_URL}?key={self.api_key}",
                 json=payload,
@@ -45,14 +46,12 @@ class TextSimplifier:
             )
             response.raise_for_status()
             logger.debug("API Response: %s", response.text)
-
         except requests.RequestException as e:
             logger.error("Network error during simplify_text: %s", e)
-            return "Sorry, I couldn't simplify this text right now. Please try again later."
+            return None
 
         try:
             data = response.json()
-            logger.debug("Parsed Data: %s", data)
             candidates = data.get("candidates")
             if candidates and isinstance(candidates, list) and len(candidates) > 0:
                 content = candidates[0].get("content", {})
