@@ -40,7 +40,14 @@ class TextSimplifier:
             f"{text}"
         )
 
-        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        payload = {
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": prompt}]
+                }
+            ]
+        }
 
         try:
             response = self.session.post(
