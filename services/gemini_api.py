@@ -18,7 +18,8 @@ class TextSimplifier:
 
     def simplify_text(self, text: str, level: str) -> Optional[str]:
         prompt = (
-            f"You are an AI teacher with 20 years of experience. Summarize and simplify the following academic text for a {level} student. Use plain English and make it very easy to understand. "
+            f"You are an AI teacher with 20 years of experience. Summarize and simplify the following academic text for a {level} student. "
+            "Use plain English and make it very easy to understand. "
             "Avoid long paragraphs, unnecessary repetition, or overexplaining. Keep it short but meaningful. "
             "Make sure the important ideas are not removed. Think like you're helping a confused student understand quickly and clearly:\n\n"
             f"{text}"
@@ -27,10 +28,9 @@ class TextSimplifier:
         payload = {
             "contents": [
                 {
+                    "role": "user",
                     "parts": [
-                        {
-                            "text": prompt
-                        }
+                        { "text": prompt }
                     ]
                 }
             ]
@@ -52,13 +52,13 @@ class TextSimplifier:
         try:
             data = response.json()
             candidates = data.get("candidates")
-            if candidates and isinstance(candidates, list) and len(candidates) > 0:
-                content = candidates[0].get("content", {})
-                parts = content.get("parts")
-                if parts and isinstance(parts, list) and len(parts) > 0:
-                    return parts[0].get("text")
+            if candidates and isinstance(candidates, list):
+                for candidate in candidates:
+                    parts = candidate.get("content", {}).get("parts", [])
+                    if parts and isinstance(parts, list):
+                        return parts[0].get("text")
             logger.error("Missing expected fields in API response: %s", response.text)
             return None
-        except (ValueError, TypeError) as e:
+        except Exception as e:
             logger.error("Error parsing response JSON: %s — Response was: %s", e, response.text)
             return None
