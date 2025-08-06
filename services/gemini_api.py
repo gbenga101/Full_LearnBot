@@ -9,7 +9,7 @@ class TextSimplifier:
     """
     Client for Google Gemini generateContent API to simplify text.
     """
-    BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+    BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
 
     def __init__(self, timeout: float = 15.0):
         self.timeout = Config.GEMINI_TIMEOUT or timeout
