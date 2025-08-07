@@ -4,7 +4,7 @@ from routes.api import api_bp
 from config.config import Config
 import logging
 
-logging.basicConfig(level=logging.DEBUG)  # Add this to show logs on Render
+logging.basicConfig(level=logging.DEBUG)  #show logs on Render
 
 app = Flask(__name__)
 
