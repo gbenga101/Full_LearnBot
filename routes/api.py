@@ -3,36 +3,59 @@ from services.gemini_api import TextSimplifier
 from services.flan_api import T5Simplifier
 
 api_bp = Blueprint('api', __name__)
+
+# Instantiate both simplifiers
 gemini_simplifier = TextSimplifier()
 t5_simplifier = T5Simplifier()
 
+
 @api_bp.route('/')
 def home():
-    return "Hello, World! Backend is running."
-
+    return "✅ LearnBot API is running.", 200
 @api_bp.route('/simplify', methods=['POST'])
-def simplify():
-    data = request.get_json()
-    if not data or 'text' not in data or 'level' not in data:
-        return jsonify({'error': 'Missing "text" or "level" in request'}), 400
+def simplify_with_gemini():
+    try:
+        data = request.get_json()
 
-    text = data['text']
-    level = data['level']
+        if not data:
+            return jsonify({'error': 'No JSON payload found'}), 400
 
-    simplified = gemini_simplifier.simplify_text(text, level)
-    if simplified:
-        return jsonify({'simplified_text': simplified}), 200
-    else:
-        return jsonify({'error': 'Failed to simplify text. Please try again later.'}), 500
+        text = data.get('text')
+        level = data.get('level')
+
+        if not text or not level:
+            return jsonify({'error': 'Missing required fields: "text" and "level"'}), 400
+
+        simplified = gemini_simplifier.simplify_text(text, level)
+
+        if simplified:
+            return jsonify({'simplified_text': simplified}), 200
+        else:
+            return jsonify({'error': 'Gemini failed to simplify text'}), 500
+
+    except Exception as e:
+        return jsonify({'error': f'Unexpected server error: {str(e)}'}), 500
 
 @api_bp.route('/simplify/t5', methods=['POST'])
 def simplify_with_t5():
-    data = request.get_json()
-    if not data or 'text' not in data:
-        return jsonify({'error': 'Missing "text" in request'}), 400
+    try:
+        data = request.get_json()
 
-    text = data['text']
-    level = data.get('level', 'layman')
+        if not data:
+            return jsonify({'error': 'No JSON payload found'}), 400
 
-    simplified = t5_simplifier.simplify(text, level)
-    return jsonify({'simplified_text': simplified}), 200
+        text = data.get('text')
+        level = data.get('level', 'layman')
+
+        if not text:
+            return jsonify({'error': 'Missing required field: "text"'}), 400
+
+        simplified = t5_simplifier.simplify(text, level)
+
+        if simplified:
+            return jsonify({'simplified_text': simplified}), 200
+        else:
+            return jsonify({'error': 'T5 failed to simplify text'}), 500
+
+    except Exception as e:
+        return jsonify({'error': f'Unexpected server error: {str(e)}'}), 500

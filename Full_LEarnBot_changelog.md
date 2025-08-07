@@ -10,7 +10,7 @@ This changelog documents the development process of the AI-Driven Personalized L
 - **IDE**: VS Code
 - **Hardware**: Toshiba Portege R930 (4GB RAM, 250GB SSD, 2.7GHz 3rd Gen Intel)
 - **Frontend**: Pure HTML, CSS (Bootstrap), JavaScript
-- **Backend**: Python 3.13 with Flask
+- **Backend**: Python 3.10 with Flask
 
 ## **Milestones**
 
