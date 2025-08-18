@@ -1,0 +1,61 @@
+import logging
+import requests
+from config.config import Config
+
+logger = logging.getLogger(__name__)
+
+class OpenAISimplifier:
+    BASE_URL = "https://api.openai.com/v1/chat/completions"
+
+    def __init__(self, timeout: float = 15.0):
+        self.timeout = Config.OPENAI_TIMEOUT or timeout
+        self.api_key = Config.OPENAI_API_KEY
+        self.session = requests.Session()
+
+        if not self.api_key:
+            logger.warning("⚠️ OPENAI_API_KEY is missing in your config.")
+
+    def simplify(self, text: str, level: str) -> str:
+        """
+        Sends a simplification prompt to OpenAI API.
+        :param text: The text to simplify.
+        :param level: Target explanation level (layman, 12-year-old, etc.).
+        :return: Simplified explanation.
+        """
+        prompt = (
+            f"You are an expert teacher. Simplify the following text for a {level} learner:\n\n"
+            f"{text}\n\n"
+            "Make it clear, short, and very easy to understand."
+        )
+
+        payload = {
+            "model": "gpt-4o-mini",   # ✅ lightweight + cheap
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+            "max_tokens": 250
+        }
+
+        try:
+            response = self.session.post(
+                self.BASE_URL,
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            logger.error("❌ HTTP error during OpenAI call: %s", e)
+            return "⚠️ OpenAI API returned an HTTP error. Please try again."
+        except requests.RequestException as e:
+            logger.error("❌ Network error during OpenAI call: %s", e)
+            return "⚠️ Network error occurred. Please check your connection."
+
+        try:
+            data = response.json()
+            return data["choices"][0]["message"]["content"].strip()
+        except Exception as e:
+            logger.error("❌ Failed to parse OpenAI response: %s\nRaw: %s", e, response.text)
+            return "⚠️ Unexpected response format from OpenAI API."
