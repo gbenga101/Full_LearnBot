@@ -49,12 +49,12 @@ import os
 
 logger = logging.getLogger(__name__)
 
-try:
+""" try:
     # lazy import to avoid failing if package not installed
     from openai import OpenAI  # if you plan to use openai-python later
 except Exception:
     OpenAI = None
-
+ """
 from config.config import Config
 
 class OpenAISimplifier:
