@@ -1,0 +1,65 @@
+Collecting annotated-types==0.7.0 (from -r requirements.txt (line 1))
+  Obtaining dependency information for annotated-types==0.7.0 from https://files.pythonhosted.org/packages/78/b6/6307fbef88d9b5ee7421e68d78a9f162e0da4900bc5f5793f6d3d0e34fb8/annotated_types-0.7.0-py3-none-any.whl.metadata
+  Using cached annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting anyio==4.10.0 (from -r requirements.txt (line 2))
+  Obtaining dependency information for anyio==4.10.0 from https://files.pythonhosted.org/packages/6f/12/e5e0282d673bb9746bacfb6e2dba8719989d3660cdb2ea79aee9a9651afb/anyio-4.10.0-py3-none-any.whl.metadata
+  Using cached anyio-4.10.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting blinker==1.9.0 (from -r requirements.txt (line 3))
+  Obtaining dependency information for blinker==1.9.0 from https://files.pythonhosted.org/packages/10/cb/f2ad4230dc2eb1a74edf38f1a38b9b52277f75bef262d8908e60d957e13c/blinker-1.9.0-py3-none-any.whl.metadata
+  Using cached blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting certifi==2025.8.3 (from -r requirements.txt (line 4))
+  Obtaining dependency information for certifi==2025.8.3 from https://files.pythonhosted.org/packages/e5/48/1549795ba7742c948d2ad169c1c8cdbae65bc450d6cd753d124b17c8cd32/certifi-2025.8.3-py3-none-any.whl.metadata
+  Using cached certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+Collecting charset-normalizer==3.4.2 (from -r requirements.txt (line 5))
+  Obtaining dependency information for charset-normalizer==3.4.2 from https://files.pythonhosted.org/packages/7d/d7/96970afb4fb66497a40761cdf7bd4f6fca0fc7bafde3a84f836c1f57a926/charset_normalizer-3.4.2-cp310-cp310-win_amd64.whl.metadata
+  Using cached charset_normalizer-3.4.2-cp310-cp310-win_amd64.whl.metadata (36 kB)
+Collecting click==8.2.1 (from -r requirements.txt (line 6))
+  Obtaining dependency information for click==8.2.1 from https://files.pythonhosted.org/packages/85/32/10bb5764d90a8eee674e9dc6f4db6a0ab47c8c4d0d83c27f7c39ac415a4d/click-8.2.1-py3-none-any.whl.metadata
+  Using cached click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+Collecting colorama==0.4.6 (from -r requirements.txt (line 7))
+  Obtaining dependency information for colorama==0.4.6 from https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl.metadata
+  Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+Collecting distro==1.9.0 (from -r requirements.txt (line 8))
+  Obtaining dependency information for distro==1.9.0 from https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl.metadata
+  Using cached distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting exceptiongroup==1.3.0 (from -r requirements.txt (line 9))
+  Obtaining dependency information for exceptiongroup==1.3.0 from https://files.pythonhosted.org/packages/36/f4/c6e662dade71f56cd2f3735141b265c3c79293c109549c1e6933b0651ffc/exceptiongroup-1.3.0-py3-none-any.whl.metadata
+  Using cached exceptiongroup-1.3.0-py3-none-any.whl.metadata (6.7 kB)
+Collecting filelock==3.13.1 (from -r requirements.txt (line 10))
+  Obtaining dependency information for filelock==3.13.1 from https://files.pythonhosted.org/packages/81/54/84d42a0bee35edba99dee7b59a8d4970eccdd44b99fe728ed912106fc781/filelock-3.13.1-py3-none-any.whl.metadata
+  Downloading filelock-3.13.1-py3-none-any.whl.metadata (2.8 kB)
+Collecting Flask==3.1.1 (from -r requirements.txt (line 11))
+  Obtaining dependency information for Flask==3.1.1 from https://files.pythonhosted.org/packages/3d/68/9d4508e893976286d2ead7f8f571314af6c2037af34853a30fd769c02e9d/flask-3.1.1-py3-none-any.whl.metadata
+  Using cached flask-3.1.1-py3-none-any.whl.metadata (3.0 kB)
+Collecting flask-cors==6.0.1 (from -r requirements.txt (line 12))
+  Obtaining dependency information for flask-cors==6.0.1 from https://files.pythonhosted.org/packages/17/f8/01bf35a3afd734345528f98d0353f2a978a476528ad4d7e78b70c4d149dd/flask_cors-6.0.1-py3-none-any.whl.metadata
+  Using cached flask_cors-6.0.1-py3-none-any.whl.metadata (5.3 kB)
+Collecting fsspec==2024.6.1 (from -r requirements.txt (line 13))
+  Obtaining dependency information for fsspec==2024.6.1 from https://files.pythonhosted.org/packages/5e/44/73bea497ac69bafde2ee4269292fa3b41f1198f4bb7bbaaabde30ad29d4a/fsspec-2024.6.1-py3-none-any.whl.metadata
+  Downloading fsspec-2024.6.1-py3-none-any.whl.metadata (11 kB)
+Collecting h11==0.16.0 (from -r requirements.txt (line 14))
+  Obtaining dependency information for h11==0.16.0 from https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl.metadata
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting httpcore==1.0.9 (from -r requirements.txt (line 15))
+  Obtaining dependency information for httpcore==1.0.9 from https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl.metadata
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting httpx==0.28.1 (from -r requirements.txt (line 16))
+  Obtaining dependency information for httpx==0.28.1 from https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl.metadata
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting huggingface-hub==0.24.6 (from -r requirements.txt (line 17))
+  Obtaining dependency information for huggingface-hub==0.24.6 from https://files.pythonhosted.org/packages/b9/8f/d6718641c14d98a5848c6a24d2376028d292074ffade0702940a4b1dde76/huggingface_hub-0.24.6-py3-none-any.whl.metadata
+  Downloading huggingface_hub-0.24.6-py3-none-any.whl.metadata (13 kB)
+Collecting idna==3.10 (from -r requirements.txt (line 18))
+  Obtaining dependency information for idna==3.10 from https://files.pythonhosted.org/packages/76/c6/c88e154df9c4e1a2a66ccf0005a88dfb2650c1dffb6f5ce603dfbd452ce3/idna-3.10-py3-none-any.whl.metadata
+  Using cached idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting itsdangerous==2.2.0 (from -r requirements.txt (line 19))
+  Obtaining dependency information for itsdangerous==2.2.0 from https://files.pythonhosted.org/packages/04/96/92447566d16df59b2a776c0fb82dbc4d9e07cd95062562af01e408583fc4/itsdangerous-2.2.0-py3-none-any.whl.metadata
+  Using cached itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting Jinja2==3.1.3 (from -r requirements.txt (line 20))
+  Obtaining dependency information for Jinja2==3.1.3 from https://files.pythonhosted.org/packages/30/6d/6de6be2d02603ab56e72997708809e8a5b0fbfee080735109b40a3564843/Jinja2-3.1.3-py3-none-any.whl.metadata
+  Downloading Jinja2-3.1.3-py3-none-any.whl.metadata (3.3 kB)
+Collecting jiter==0.10.0 (from -r requirements.txt (line 21))
+  Obtaining dependency information for jiter==0.10.0 from https://files.pythonhosted.org/packages/37/7a/8021bd615ef7788b98fc76ff533eaac846322c170e93cbffa01979197a45/jiter-0.10.0-cp310-cp310-win_amd64.whl.metadata
+  Using cached jiter-0.10.0-cp310-cp310-win_amd64.whl.metadata (5.3 kB)
+ERROR: Could not find a version that satisfies the requirement MarkupSafe==2.1.5 (from versions: none)
+ERROR: No matching distribution found for MarkupSafe==2.1.5
