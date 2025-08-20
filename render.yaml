@@ -2,10 +2,11 @@ services:
   - type: web
     name: learnbot-api
     env: python
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
     startCommand: "python app.py"
     envVars:
       - key: GEMINI_API_KEY
-        value: ""
+        # DO NOT set value here in repo. Set it in Render dashboard as a secret.
+        sync: false
       - key: FLASK_DEBUG
-        value: true
+        value: "false"
