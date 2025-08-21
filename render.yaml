@@ -3,7 +3,7 @@ services:
     name: learnbot-api
     env: python
     plan: free
-    buildCommand: "pip install --upgrade pip && pip install -r requirements_render.txt"
+    buildCommand: "pip install --upgrade pip setuptools wheel && pip install -r requirements_render.txt"
     startCommand: "python app.py"
     envVars:
       - key: GEMINI_API_KEY
