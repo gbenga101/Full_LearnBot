@@ -12,7 +12,7 @@ class HFSimplifier:
         if not HF_TOKEN:
             logger.warning("HF_API_KEY not found in env. HFSimplifier will fail until key is set.")
 
-    def simplify(self, text: str, level: str = "layman", max_new_tokens: int = 256) -> str:
+    def simplify(self, text: str, level: str = "layman", max_new_tokens: int = 128) -> str:
         if not HF_TOKEN:
             return "⚠️ Hugging Face API key not configured."
 
