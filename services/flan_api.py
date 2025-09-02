@@ -1,14 +1,18 @@
-#LATEST IMPROVEMENT:
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+# services/flan_api.py
+
+import os
+import requests
 
 class T5Simplifier:
     def __init__(self, model_name="google/flan-t5-base"):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+        self.model_name = model_name
+        self.api_token = os.getenv("HF_API_TOKEN")
+        if not self.api_token:
+            raise ValueError("⚠️ Missing Hugging Face API token. Please set HF_API_TOKEN in your .env")
 
     def simplify(self, text, level="layman"):
         """
-        Simplifies text in a way that's consistent with the Gemini provider.
+        Simplifies text using Hugging Face Inference API.
         """
         prompt = (
             f"You are a LearnBot, an AI teacher with 20+ years of experience. "
@@ -23,19 +27,20 @@ class T5Simplifier:
             f"Text to simplify:\n{text}"
         )
 
-        inputs = self.tokenizer(prompt, return_tensors="pt", max_length=512, truncation=True)
-        outputs = self.model.generate(
-            **inputs,
-            max_new_tokens=150,
-            do_sample=True,
-            temperature=0.7,
-            top_p=0.9,
-            num_beams=4,
-            early_stopping=True
-        )
+        url = f"https://api-inference.huggingface.co/models/{self.model_name}"
+        headers = {"Authorization": f"Bearer {self.api_token}"}
+        payload = {"inputs": prompt, "parameters": {"max_new_tokens": 150, "temperature": 0.7}}
 
-        result = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return result.strip()
+        response = requests.post(url, headers=headers, json=payload)
+        
+        if response.status_code != 200:
+            raise RuntimeError(f"Hugging Face API error: {response.status_code} - {response.text}")
+
+        result = response.json()
+        if isinstance(result, list) and "generated_text" in result[0]:
+            return result[0]["generated_text"].strip()
+        return str(result).strip()
+
 
 """ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
