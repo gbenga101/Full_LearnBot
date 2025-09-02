@@ -3,7 +3,7 @@ import logging
 from flask import Blueprint, request, jsonify
 import hashlib, os, time
 
-# light-weight imports
+# light-weight imports (these should not import heavy ML libs)
 from services.openai_api import OpenAISimplifier
 from services.hf_api import HFSimplifier
 
@@ -15,10 +15,9 @@ openai_simplifier = OpenAISimplifier()
 hf_simplifier = HFSimplifier()  # uses HF API (hosted)
 
 # Simple in-memory cache for demo (not persistent; ok for showcase)
-# key -> {"result": ..., "ts": epoch_seconds}
 simple_cache = {}
 CACHE_MAX_ITEMS = 512
-CACHE_TTL_SECONDS = 60 * 60  # 1 hour; change as needed
+CACHE_TTL_SECONDS = 60 * 60  # 1 hour
 
 def make_cache_key(provider: str, level: str, text: str) -> str:
     key_source = f"{provider}|{level}|{text}"
@@ -28,9 +27,7 @@ def get_cached(key: str):
     entry = simple_cache.get(key)
     if not entry:
         return None
-    # TTL check
     if time.time() - entry.get("ts", 0) > CACHE_TTL_SECONDS:
-        # expired
         try:
             del simple_cache[key]
         except KeyError:
@@ -39,9 +36,7 @@ def get_cached(key: str):
     return entry.get("result")
 
 def set_cached(key: str, value: str):
-    # simple size eviction: remove oldest if exceeded
     if len(simple_cache) >= CACHE_MAX_ITEMS:
-        # naive eviction: pop first inserted key
         first_key = next(iter(simple_cache))
         try:
             del simple_cache[first_key]
@@ -82,7 +77,7 @@ def simplify():
         provider = (data.get('provider') or 'gemini').lower()
 
         if not text:
-            return jsonify({'error': 'Missing required field: \"text\"'}), 400
+            return jsonify({'error': 'Missing required field: "text"'}), 400
 
         def is_failure(resp):
             return not resp or (isinstance(resp, str) and resp.startswith("⚠️"))
@@ -106,18 +101,30 @@ def simplify():
         # T5 chosen: try hosted HF first, then local T5, then Gemini, then OpenAI
         elif provider == 't5':
             logger.info("Provider chosen: T5 (user-selected). Trying hosted HF first.")
-            simplified = hf_simplifier.simplify(text, level)
+            try:
+                simplified = hf_simplifier.simplify(text, level)
+            except Exception as e:
+                logger.exception("❌ HF hosted call crashed: %s", e)
+                simplified = "⚠️ HF error"
 
             if is_failure(simplified):
                 logger.warning("Hosted HF failed or returned error. Attempting local T5.")
                 local_t5 = get_t5_simplifier()
                 if local_t5:
-                    simplified = local_t5.simplify(text, level)
+                    try:
+                        simplified = local_t5.simplify(text, level)
+                    except Exception as e:
+                        logger.exception("❌ Local T5 crashed: %s", e)
+                        simplified = "⚠️ Local T5 error"
                 if is_failure(simplified):
                     logger.warning("Local T5 failed or missing. Falling back to Gemini -> OpenAI.")
                     gemini = get_gemini_simplifier()
                     if gemini:
-                        simplified = gemini.simplify_text(text, level)
+                        try:
+                            simplified = gemini.simplify_text(text, level)
+                        except Exception as e:
+                            logger.exception("❌ Gemini crashed: %s", e)
+                            simplified = "⚠️ Gemini error"
                     if is_failure(simplified):
                         simplified = openai_simplifier.simplify(text, level)
 
@@ -126,13 +133,21 @@ def simplify():
             logger.info("Provider chosen: Gemini (default). Trying Gemini first.")
             gemini = get_gemini_simplifier()
             if gemini:
-                simplified = gemini.simplify_text(text, level)
+                try:
+                    simplified = gemini.simplify_text(text, level)
+                except Exception as e:
+                    logger.exception("❌ Gemini crashed: %s", e)
+                    simplified = "⚠️ Gemini error"
             else:
                 logger.warning("Gemini service unavailable (suspended or import failed).")
 
             if is_failure(simplified):
                 logger.warning("Gemini failed or returned invalid result. Falling back to hosted HF.")
-                simplified = hf_simplifier.simplify(text, level)
+                try:
+                    simplified = hf_simplifier.simplify(text, level)
+                except Exception as e:
+                    logger.exception("❌ HF hosted call crashed: %s", e)
+                    simplified = "⚠️ HF error"
                 if is_failure(simplified):
                     logger.warning("Hosted HF failed. Falling back to OpenAI.")
                     simplified = openai_simplifier.simplify(text, level)

@@ -1,14 +1,20 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask
 from flask_cors import CORS
 from routes.api import api_bp
 from config.config import Config
 import logging
 
-logging.basicConfig(level=logging.DEBUG)  #show logs on Render
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 app = Flask(__name__)
 
-# ✅ Enable CORS with full support for all origins, methods, and headers
+# ✅ Enable CORS with specific origins (keeps existing config)
 CORS(app, resources={r"/*": {"origins": [
     "https://gbenga101.github.io",
     "https://gbenga101.github.io/LearnBot",
@@ -30,6 +36,7 @@ if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
+
 
 """ 
 from flask import Flask, request, jsonify

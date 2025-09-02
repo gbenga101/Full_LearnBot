@@ -3,11 +3,11 @@ import os
 import requests
 
 class T5Simplifier:
-    def __init__(self, model_name="google/flan-t5-base"):
+    def __init__(self, model_name="google/flan-t5-small"):  # safer default
         self.model_name = model_name
-        self.api_token = os.getenv("HF_API_TOKEN")
+        self.api_token = os.getenv("HF_API_KEY")  # match your .env
         if not self.api_token:
-            raise ValueError("⚠️ Missing Hugging Face API token. Please set HF_API_TOKEN in your .env")
+            raise ValueError("⚠️ Missing Hugging Face API key. Please set HF_API_KEY in your .env")
 
     def simplify(self, text, level="layman"):
         """
@@ -39,6 +39,7 @@ class T5Simplifier:
         if isinstance(result, list) and "generated_text" in result[0]:
             return result[0]["generated_text"].strip()
         return str(result).strip()
+
 
 
 """ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM

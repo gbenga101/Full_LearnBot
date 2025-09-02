@@ -1,60 +1,59 @@
 # services/openai_api.py
-import logging
-from typing import Optional
 import os
+import logging
 
 logger = logging.getLogger(__name__)
 
-class OpenAISimplifier:
-    def __init__(self):
-        self.api_key = Config.OPENAI_API_KEY if hasattr(Config, 'OPENAI_API_KEY') else os.getenv('OPENAI_API_KEY', '')
-        # If you later want to use the SDK, initialize here:
-        # if self.api_key and OpenAI:
-        #     self.client = OpenAI(api_key=self.api_key)
-        # else:
-        #     self.client = None
-
-    def simplify_text(self, text: str, level: str) -> Optional[str]:
-        """
-        Minimal safe stub. If OPENAI_API_KEY is set, you can replace this body with an actual call.
-        For now: return clear placeholder if key is missing so frontend won't crash.
-        """
-        if not self.api_key:
-            logger.info("OpenAI API key not configured — returning placeholder.")
-            return "[OpenAI fallback inactive: no API key configured on server]"
-
-        # TODO: Replace with actual OpenAI call (ChatCompletions / responses) when you add a key.
-        # Keep this block simple, return a short placeholder for now to avoid errors.
-        logger.info("OpenAI API key present but real call is not implemented in stub.")
-        return "[OpenAI fallback stub: key found but call not implemented]"
-# services/openai_api.py
-""" try:
-    # lazy import to avoid failing if package not installed
-    from openai import OpenAI  # if you plan to use openai-python later
+try:
+    import openai
 except Exception:
-    OpenAI = None
- """
-from config.config import Config
+    openai = None
+    logger.warning("OpenAI SDK not available in environment (openai package missing).")
 
 class OpenAISimplifier:
-    def __init__(self):
-        self.api_key = Config.OPENAI_API_KEY if hasattr(Config, 'OPENAI_API_KEY') else os.getenv('OPENAI_API_KEY', '')
-        # If you later want to use the SDK, initialize here:
-        # if self.api_key and OpenAI:
-        #     self.client = OpenAI(api_key=self.api_key)
-        # else:
-        #     self.client = None
+    def __init__(self, model: str = "gpt-4o-mini"):
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.model = model
+        if self.api_key and openai:
+            openai.api_key = self.api_key
+        elif not self.api_key:
+            logger.warning("⚠️ OPENAI_API_KEY not configured; OpenAI fallback will return errors.")
 
-    def simplify_text(self, text: str, level: str) -> Optional[str]:
+    def simplify(self, text: str, level: str = "layman") -> str:
         """
-        Minimal safe stub. If OPENAI_API_KEY is set, you can replace this body with an actual call.
-        For now: return clear placeholder if key is missing so frontend won't crash.
+        Use OpenAI as the final fallback. Returns a string.
+        If OpenAI is not configured or an error occurs, returns a '⚠️' prefixed string.
         """
         if not self.api_key:
-            logger.info("OpenAI API key not configured — returning placeholder.")
-            return "[OpenAI fallback inactive: no API key configured on server]"
+            return "⚠️ OpenAI API key not configured."
 
-        # TODO: Replace with actual OpenAI call (ChatCompletions / responses) when you add a key.
-        # Keep this block simple, return a short placeholder for now to avoid errors.
-        logger.info("OpenAI API key present but real call is not implemented in stub.")
-        return "[OpenAI fallback stub: key found but call not implemented]"
+        if openai is None:
+            return "⚠️ OpenAI SDK not installed."
+
+        prompt = (
+            f"You are LearnBot, an experienced AI teacher. Explain the following text for a {level} learner.\n\n"
+            f"Text:\n{text}\n\n"
+            "Give a clear, structured, and concise explanation suitable for a tertiary student."
+        )
+
+        try:
+            # Use chat completion if available
+            # This uses the OpenAI Python client - adjust model if needed
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=300,
+                temperature=0.7
+            )
+            # Extract text safely
+            choices = response.get("choices") or []
+            if choices and "message" in choices[0] and "content" in choices[0]["message"]:
+                return choices[0]["message"]["content"].strip()
+            # older completion format fallback
+            if choices and "text" in choices[0]:
+                return choices[0]["text"].strip()
+            logger.error("OpenAI returned unexpected response: %s", response)
+            return "⚠️ OpenAI returned unexpected format."
+        except Exception as e:
+            logger.exception("OpenAI simplify call failed")
+            return f"⚠️ OpenAI error: {str(e)}"
