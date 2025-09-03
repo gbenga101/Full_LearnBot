@@ -1,15 +1,42 @@
 # services/flan_api.py
 import os
+import logging
 import requests
 
-class T5Simplifier:
-    def __init__(self, model_name="google/flan-t5-small"):  # safer default
-        self.model_name = model_name
-        self.api_token = os.getenv("HF_API_KEY")  # match your .env
-        if not self.api_token:
-            raise ValueError("⚠️ Missing Hugging Face API key. Please set HF_API_KEY in your .env")
+logger = logging.getLogger(__name__)
 
-    def simplify(self, text, level="layman"):
+class T5Simplifier:
+    """Safe wrapper for a T5 simplifier. This variant will try HF model (same as HFSimplifier)
+    but will never raise — it returns ⚠️-prefixed error strings on failure so fallback logic works."""
+    def __init__(self, model_name="google/flan-t5-small"):
+        self.model_name = model_name
+        self.api_key = os.getenv("HF_API_KEY")
+        self.headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+
+    def simplify(self, text: str, level: str = "layman") -> str:
+        if not self.api_key:
+            return "⚠️ Hugging Face API key not configured for local T5 wrapper."
+
+        prompt = (
+            f"You are LearnBot, an AI teacher. Explain for a {level} learner:\n\n{text}"
+        )
+        payload = {"inputs": prompt, "parameters": {"max_new_tokens": 150, "temperature": 0.7}}
+        url = f"https://api-inference.huggingface.co/models/{self.model_name}"
+        try:
+            resp = requests.post(url, headers=self.headers, json=payload, timeout=60)
+            if resp.status_code != 200:
+                logger.error("Local T5 wrapper HF call returned %s: %s", resp.status_code, resp.text)
+                return f"⚠️ Hugging Face API error: {resp.status_code} - {resp.text}"
+            data = resp.json()
+            if isinstance(data, list) and data and "generated_text" in data[0]:
+                return data[0]["generated_text"].strip()
+            if isinstance(data, dict) and "generated_text" in data:
+                return data["generated_text"].strip()
+            return str(data)
+        except Exception as e:
+            logger.exception("Local T5 (HF) call failed")
+            return f"⚠️ Local T5 error: {str(e)}"
+
         """
         Simplifies text using Hugging Face Inference API.
         """
