@@ -1,7 +1,9 @@
+# services/gemini_api.py
 import logging
 from typing import Optional
 import requests
 from config.config import Config
+from services.exceptions import RateLimitError, APIError, NetworkError
 
 logger = logging.getLogger(__name__)
 
@@ -16,20 +18,25 @@ class TextSimplifier:
         if not self.api_key:
             logger.warning("⚠️ GEMINI_API_KEY is missing in your config.")
 
-    def simplify_text(self, text: str, level: str) -> Optional[str]:
+    def simplify_text(self, text: str, level: str) -> str:
         """
         Sends a prompt to Gemini API to simplify academic text for a target audience.
+        Returns simplified text or raises Provider exceptions on errors.
         """
+        if not text or not text.strip():
+            raise APIError("Empty input text")
+
         prompt = (
-            f"You are LearnBot, a friendly AI teacher with 20+ years of experience. "
-            f"Explain the following text for a {level} learner in the clearest way possible. "
-            "Follow these rules:\n"
-            "1. Use plain, everyday English.\n"
-            "2. Keep it concise but do not skip important details.\n"
-            "3. Use short sentences and simple words.\n"
-            "4. When possible, give a quick example or analogy to make it relatable.\n"
-            "5. Break information into bullet points or steps if it improves clarity.\n"
-            "6. Avoid jargon unless you explain it.\n\n"
+            f"You are LearnBot, an AI designed to make complex academic content accessible to learners of all levels. "
+            f"Your goal is to summarize and simplify the provided text for a {level} learner, ensuring clarity and engagement. "
+            "Follow these guidelines:\n"
+            "1. Use simple, conversational English with short sentences.\n"
+            "2. Summarize concisely but retain all key concepts and critical details.\n"
+            "3. Explain any technical terms or jargon in plain language.\n"
+            "4. Include a relatable example, analogy, or metaphor to aid understanding.\n"
+            "5. Organize complex ideas into bullet points, steps, or short paragraphs for readability.\n"
+            "6. Maintain a friendly, encouraging tone to keep the learner motivated.\n"
+            "7. Avoid removing essential information or oversimplifying to the point of inaccuracy.\n\n"
             f"Text to simplify:\n{text}"
         )
 
@@ -47,21 +54,41 @@ class TextSimplifier:
                 json=payload,
                 timeout=self.timeout,
             )
+        except requests.RequestException as e:
+            logger.error("❌ Network error during Gemini call: %s", e)
+            raise NetworkError(str(e))
+
+        # HTTP layer
+        if response.status_code == 429:
+            logger.warning("Gemini rate-limited (429). Status: %s", response.status_code)
+            raise RateLimitError("Gemini rate-limited (429)")
+
+        try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             logger.error("❌ HTTP error during Gemini call: %s", e)
-            return "⚠️ Gemini API returned an HTTP error. Please try again."
-        except requests.RequestException as e:
-            logger.error("❌ Network error during Gemini call: %s", e)
-            return "⚠️ Network error occurred. Please check your connection and try again."
+            # include response text for debugging
+            raise APIError(f"Gemini HTTP error: {getattr(response, 'status_code', None)} - {getattr(response, 'text', '')}")
 
+        # Parse response
         try:
             data = response.json()
-            parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
-            return parts[0].get("text") if parts else "⚠️ No explanation returned by Gemini."
         except Exception as e:
-            logger.error("❌ Failed to parse Gemini response: %s\nRaw response: %s", e, response.text)
-            return "⚠️ Unexpected response format from Gemini API."
+            logger.error("❌ Failed to decode Gemini JSON response: %s\nRaw response: %s", e, response.text)
+            raise APIError("Failed to decode Gemini JSON response")
+
+        parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
+        if parts:
+            text_out = parts[0].get("text")
+            if text_out and isinstance(text_out, str) and text_out.strip():
+                return text_out.strip()
+            else:
+                logger.error("❌ Gemini returned empty or malformed parts: %s", parts)
+                raise APIError("Gemini returned empty response")
+        else:
+            logger.error("❌ No explanation returned by Gemini. Raw JSON: %s", data)
+            raise APIError("No explanation returned by Gemini")
+
 
 
 """ import logging
