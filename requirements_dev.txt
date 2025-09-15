@@ -1,4 +1,5 @@
 -r requirements.render.txt
 pytesseract==0.3.13     # optional local OCR Python wrapper (requires tesseract binary)
 docker==6.1.3            # python docker SDK (only used locally when Docker available)
+numpy==2.1.2
 # Note: google-cloud-vision is only needed if using Google Vision API for OCR
