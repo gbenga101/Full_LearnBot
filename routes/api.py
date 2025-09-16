@@ -92,43 +92,41 @@ def simplify():
 
         simplified = None
 
-        # Helper to call OpenAI safely (since OpenAI adapter may still return error strings)
+        # Helper: safe OpenAI call
         def call_openai(text, level):
             try:
                 res = openai_simplifier.simplify(text, level)
             except Exception as e:
                 logger.exception("OpenAI call raised an exception: %s", e)
                 return None
-            # if OpenAI follows old pattern of returning "⚠️ ..." treat as failure
             if isinstance(res, str) and res.startswith("⚠️"):
                 return None
             return res
 
-        # Try to validate & format provider output.
-        def try_format_or_mark_failure(simplified):
-            """
-            Try to validate & format provider output.
-            On success -> return formatted string.
-            On validator failure -> return None to indicate provider should be treated as failure
-            """
-            try:
-                formatted = validate_and_format(simplified)
-                return formatted
-            except Exception as e:
-                # Log and return None so calling code will fallback to next provider
-                logger.warning("Validator rejected provider output (will try fallback): %s", e)
+        # Helper: wrap into structure if needed
+        def enforce_structure(raw_text: str) -> str:
+            if not raw_text:
                 return None
+            try:
+                return validate_and_format(raw_text)
+            except Exception:
+                pass
+            return (
+                "### Simple Explanation\n"
+                f"{raw_text.strip()}\n\n"
+                "### Key Points\n"
+                "- (Raw output, no structured bullets available)"
+            )
 
-        # Provider flows
-
+        # --- Provider flows ---
         if provider == 'openai':
-            logger.info("Provider chosen: OpenAI (user-selected). Calling OpenAI only.")
+            logger.info("Provider chosen: OpenAI (user-selected).")
             res = call_openai(text, level)
             if res:
                 simplified = res
 
         elif provider == 't5':
-            logger.info("Provider chosen: T5 (user-selected). Trying local T5 first.")
+            logger.info("Provider chosen: T5 (user-selected).")
             local_t5 = get_t5_simplifier()
             if local_t5:
                 try:
@@ -137,36 +135,35 @@ def simplify():
                     logger.exception("❌ Local T5 crashed: %s", e)
 
             if not simplified:
-                # fallback: Gemini -> OpenRouter -> OpenAI
                 gemini = get_gemini_simplifier()
                 if gemini:
                     try:
                         simplified = gemini.simplify_text(text, level)
                     except RateLimitError:
-                        logger.warning("Gemini rate-limited; continuing to OpenRouter/OpenAI.")
+                        logger.warning("Gemini rate-limited; trying OpenRouter/OpenAI.")
                     except ProviderError as e:
                         logger.exception("Gemini provider error: %s", e)
 
-                if not simplified and openrouter_simplifier:
-                    try:
-                        simplified = openrouter_simplifier.simplify_text(text, level)
-                    except RateLimitError:
-                        logger.warning("OpenRouter rate-limited; continuing to OpenAI.")
-                    except ProviderError as e:
-                        logger.exception("OpenRouter provider error: %s", e)
+            if not simplified and openrouter_simplifier:
+                try:
+                    simplified = openrouter_simplifier.simplify_text(text, level)
+                except RateLimitError:
+                    logger.warning("OpenRouter rate-limited; trying OpenAI.")
+                except ProviderError as e:
+                    logger.exception("OpenRouter provider error: %s", e)
 
-                if not simplified:
-                    simplified = call_openai(text, level)
+            if not simplified:
+                simplified = call_openai(text, level)
 
         else:
-            # default/gemini flow
-            logger.info("Provider chosen: Gemini (default). Trying Gemini first.")
+            # default = Gemini flow
+            logger.info("Provider chosen: Gemini (default).")
             gemini = get_gemini_simplifier()
             if gemini:
                 try:
                     simplified = gemini.simplify_text(text, level)
                 except RateLimitError:
-                    logger.warning("Gemini rate-limited; trying OpenRouter next.")
+                    logger.warning("Gemini rate-limited; trying OpenRouter.")
                 except ProviderError as e:
                     logger.exception("Gemini provider error: %s", e)
 
@@ -176,36 +173,28 @@ def simplify():
                     try:
                         simplified = openrouter_simplifier.simplify_text(text, level)
                     except RateLimitError:
-                        logger.warning("OpenRouter rate-limited; trying OpenAI next.")
+                        logger.warning("OpenRouter rate-limited; trying OpenAI.")
                     except ProviderError as e:
                         logger.exception("OpenRouter provider error: %s", e)
-                else:
-                    logger.warning("OpenRouter not available; will try OpenAI.")
 
             if not simplified:
                 logger.info("Falling back to OpenAI.")
                 simplified = call_openai(text, level)
 
-        # attempt to validate; if validator fails, treat as provider failure (None)
-        validated = try_format_or_mark_failure(simplified)
+        # --- Always enforce structure ---
+        final_text = enforce_structure(simplified)
 
-        if not validated:
-            # signal failure to caller so fallback chain continues; in your flow this will lead
-            # to trying the next provider (openrouter/openai etc.). If no providers left,
-            # fall through to the existing "all providers failed" error handling.
-            simplified = None
-        else:
-            # success: cache & return structured response
-            set_cached(cache_key, validated)
+        if final_text:
+            set_cached(cache_key, final_text)
             return jsonify({
-                'simplified_text': validated,
+                'simplified_text': final_text,
                 'evidence': None,
                 'provider': provider,
                 'fallback_chain': ['gemini', 'openrouter', 'openai'],
                 'cached': False
             }), 200
 
-        logger.error("All providers failed to produce a valid simplification for this request (provider=%s).", provider)
+        logger.error("All providers failed (provider=%s).", provider)
         return jsonify({'error': 'All providers failed to simplify text.'}), 500
 
     except Exception as e:
