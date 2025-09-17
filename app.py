@@ -29,6 +29,8 @@ app.config['JSON_SORT_KEYS'] = False
 
 # Register API routes
 app.register_blueprint(api_bp)
+from routes.upload import upload_bp
+app.register_blueprint(upload_bp)
 
 # Run the app (supports Render dynamic port)
 if __name__ == '__main__':
