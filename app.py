@@ -4,6 +4,8 @@ load_dotenv()
 from flask import Flask
 from flask_cors import CORS
 from routes.api import api_bp
+from routes.upload import upload_bp
+from routes.upload_and_simplify import upload_and_simplify_bp
 from config.config import Config
 import logging
 
@@ -29,8 +31,8 @@ app.config['JSON_SORT_KEYS'] = False
 
 # Register API routes
 app.register_blueprint(api_bp)
-from routes.upload import upload_bp
 app.register_blueprint(upload_bp)
+app.register_blueprint(upload_and_simplify_bp)
 
 # Run the app (supports Render dynamic port)
 if __name__ == '__main__':

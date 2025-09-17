@@ -1,23 +1,29 @@
-# services/gemini_api.py
 import logging
 from typing import Optional
 import requests
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from config.config import Config
 from services.exceptions import RateLimitError, APIError, NetworkError
 
 logger = logging.getLogger(__name__)
 
 class TextSimplifier:
-    BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+    BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
     def __init__(self, timeout: float = 15.0):
-        self.timeout = Config.GEMINI_TIMEOUT or timeout
+        self.timeout = max(float(Config.GEMINI_TIMEOUT or timeout), 1.0)  # Ensure positive timeout
         self.api_key = Config.GEMINI_API_KEY
         self.session = requests.Session()
 
         if not self.api_key:
-            logger.warning("⚠️ GEMINI_API_KEY is missing in your config.")
+            logger.error("⚠️ GEMINI_API_KEY is missing in config.")
+            raise APIError("GEMINI_API_KEY is required but not set in config.")
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        retry=retry_if_exception_type(RateLimitError)
+    )
     def simplify_text(self, text: str, level: str) -> str:
         """
         Sends a prompt to Gemini API to simplify academic text for a target audience.
@@ -67,7 +73,6 @@ class TextSimplifier:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             logger.error("❌ HTTP error during Gemini call: %s", e)
-            # include response text for debugging
             raise APIError(f"Gemini HTTP error: {getattr(response, 'status_code', None)} - {getattr(response, 'text', '')}")
 
         # Parse response
@@ -77,18 +82,21 @@ class TextSimplifier:
             logger.error("❌ Failed to decode Gemini JSON response: %s\nRaw response: %s", e, response.text)
             raise APIError("Failed to decode Gemini JSON response")
 
-        parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
+        parts = []
+        candidates = data.get("candidates", [])
+        for candidate in candidates:
+            content = candidate.get("content", {})
+            parts.extend(content.get("parts", []))
         if parts:
             text_out = parts[0].get("text")
             if text_out and isinstance(text_out, str) and text_out.strip():
                 return text_out.strip()
             else:
                 logger.error("❌ Gemini returned empty or malformed parts: %s", parts)
-                raise APIError("Gemini returned empty response")
+                raise APIError("Gemini returned empty or malformed response")
         else:
-            logger.error("❌ No explanation returned by Gemini. Raw JSON: %s", data)
-            raise APIError("No explanation returned by Gemini")
-
+            logger.error("❌ No candidates returned by Gemini. Raw JSON: %s", data)
+            raise APIError("No candidates returned by Gemini")
 
 
 """ import logging
